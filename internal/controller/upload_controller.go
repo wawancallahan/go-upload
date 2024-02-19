@@ -5,13 +5,17 @@ import (
 	"github.com/wawancallahan/go-upload/internal/service"
 )
 
-type UploadControllerImpl struct {
-	UploadServiceImpl *service.UploadServiceImpl
+type UploadController interface {
+	Upload(ctx *fiber.Ctx) error
 }
 
-func NewUploadController(UploadServiceImpl *service.UploadServiceImpl) *UploadControllerImpl {
+type UploadControllerImpl struct {
+	UploadService service.UploadService
+}
+
+func NewUploadController(UploadService service.UploadService) UploadController {
 	return &UploadControllerImpl{
-		UploadServiceImpl: UploadServiceImpl,
+		UploadService: UploadService,
 	}
 }
 
@@ -32,7 +36,7 @@ func (c *UploadControllerImpl) Upload(ctx *fiber.Ctx) error {
 		})
 	}
 
-	_, err = c.UploadServiceImpl.Upload(file)
+	_, err = c.UploadService.Upload(file)
 
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -41,7 +45,7 @@ func (c *UploadControllerImpl) Upload(ctx *fiber.Ctx) error {
 		})
 	}
 
-	_ = c.UploadServiceImpl.Remove(file)
+	_ = c.UploadService.Remove(file)
 
 	return ctx.Status(fiber.StatusOK).JSON(fiber.Map{
 		"status": fiber.StatusOK,

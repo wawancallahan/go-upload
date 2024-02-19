@@ -9,9 +9,14 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+type UploadService interface {
+	Upload(file *multipart.FileHeader) (bool, error)
+	Remove(file *multipart.FileHeader) error
+}
+
 type UploadServiceImpl struct{}
 
-func NewUploadService() *UploadServiceImpl {
+func NewUploadService() UploadService {
 	return &UploadServiceImpl{}
 }
 
